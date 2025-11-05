@@ -164,7 +164,7 @@ const createOrUpdateGoogleUser = async googleProfile => {
         $set: {
           lastLogin: new Date(),
           ...(googleId && { googleId }),
-          ...(!profilePicture && profilePicture && { profilePicture }),
+          ...(profilePicture && { profilePicture }),
         },
       },
       {

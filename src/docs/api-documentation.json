@@ -1,16 +1,16 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Searlo API",
-    "description": "API documentation for Searlo - A comprehensive search application with Google OAuth authentication",
+    "title": "Inventory Management System API",
+    "description": "API documentation for Inventory Management System - A web application for managing custom inventories with flexible fields and access control. Features Google OAuth authentication, role-based access control, and custom inventory templates.",
     "version": "1.0.0",
     "contact": {
-      "name": "Searlo Support",
-      "email": "support@searlo.com"
+      "name": "API Support",
+      "email": "support@inventorymanagement.com"
     },
     "license": {
-      "name": "MIT",
-      "url": "https://opensource.org/licenses/MIT"
+      "name": "ISC",
+      "url": "https://opensource.org/licenses/ISC"
     }
   },
   "servers": [
@@ -19,7 +19,7 @@
       "description": "Development server"
     },
     {
-      "url": "https://api.searlo.com",
+      "url": "https://api.inventorymanagement.com",
       "description": "Production server"
     }
   ],
@@ -49,10 +49,36 @@
             "type": "string",
             "description": "User's full name"
           },
-          "picture": {
+          "avatar": {
             "type": "string",
             "format": "uri",
-            "description": "URL to user's profile picture"
+            "description": "URL to user's profile avatar/picture"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "admin"],
+            "description": "User's role in the system"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether the user account is active"
+          },
+          "isBlocked": {
+            "type": "boolean",
+            "description": "Whether the user account is blocked"
+          },
+          "authProvider": {
+            "type": "string",
+            "description": "Authentication provider (e.g., google)"
+          },
+          "isEmailVerified": {
+            "type": "boolean",
+            "description": "Whether the user's email is verified"
+          },
+          "lastLogin": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last login timestamp"
           },
           "createdAt": {
             "type": "string",
@@ -65,7 +91,7 @@
             "description": "Last profile update timestamp"
           }
         },
-        "required": ["id", "email", "name"]
+        "required": ["id", "email", "name", "role", "isActive"]
       },
       "UserUpdateRequest": {
         "type": "object",
@@ -76,198 +102,52 @@
             "maxLength": 100,
             "description": "User's full name"
           },
-          "picture": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address"
+          },
+          "profilePicture": {
             "type": "string",
             "format": "uri",
             "description": "URL to user's profile picture"
           }
         }
       },
-      "SearchResult": {
+      "UserListResponse": {
         "type": "object",
         "properties": {
-          "results": {
+          "users": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "url": {
-                  "type": "string",
-                  "format": "uri"
-                },
-                "snippet": {
-                  "type": "string"
-                },
-                "displayUrl": {
-                  "type": "string"
-                }
+              "$ref": "#/components/schemas/User"
+            },
+            "description": "Array of user objects"
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "description": "Current page number"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Number of users per page"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total number of users"
+              },
+              "pages": {
+                "type": "integer",
+                "description": "Total number of pages"
               }
             }
-          },
-          "totalResults": {
-            "type": "integer"
-          },
-          "searchTime": {
-            "type": "number"
           }
         }
       },
-      "ImageSearchResult": {
-        "type": "object",
-        "properties": {
-          "results": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "url": {
-                  "type": "string",
-                  "format": "uri"
-                },
-                "thumbnailUrl": {
-                  "type": "string",
-                  "format": "uri"
-                },
-                "width": {
-                  "type": "integer"
-                },
-                "height": {
-                  "type": "integer"
-                },
-                "size": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "totalResults": {
-            "type": "integer"
-          }
-        }
-      },
-      "NewsSearchResult": {
-        "type": "object",
-        "properties": {
-          "results": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "type": "string"
-                },
-                "url": {
-                  "type": "string",
-                  "format": "uri"
-                },
-                "snippet": {
-                  "type": "string"
-                },
-                "source": {
-                  "type": "string"
-                },
-                "publishedAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "imageUrl": {
-                  "type": "string",
-                  "format": "uri"
-                }
-              }
-            }
-          },
-          "totalResults": {
-            "type": "integer"
-          }
-        }
-      },
-      "AdvancedSearchRequest": {
-        "type": "object",
-        "properties": {
-          "query": {
-            "type": "string"
-          },
-          "exactPhrase": {
-            "type": "string"
-          },
-          "anyWords": {
-            "type": "string"
-          },
-          "excludeWords": {
-            "type": "string"
-          },
-          "site": {
-            "type": "string"
-          },
-          "fileType": {
-            "type": "string"
-          },
-          "dateRange": {
-            "type": "string",
-            "enum": ["day", "week", "month", "year"]
-          },
-          "language": {
-            "type": "string"
-          },
-          "region": {
-            "type": "string"
-          },
-          "limit": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 50,
-            "default": 10
-          }
-        },
-        "required": ["query"]
-      },
-      "SearchAnalytics": {
-        "type": "object",
-        "properties": {
-          "totalSearches": {
-            "type": "integer"
-          },
-          "topQueries": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "query": {
-                  "type": "string"
-                },
-                "count": {
-                  "type": "integer"
-                }
-              }
-            }
-          },
-          "searchTrends": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "type": "string",
-                  "format": "date"
-                },
-                "count": {
-                  "type": "integer"
-                }
-              }
-            }
-          },
-          "averageResponseTime": {
-            "type": "number"
-          }
-        }
-      },
+
       "ApiResponse": {
         "type": "object",
         "properties": {
@@ -443,51 +323,39 @@
     "/": {
       "get": {
         "tags": ["System"],
-        "summary": "API Health Check",
-        "description": "Returns the health status of the API",
+        "summary": "API Welcome Message",
+        "description": "Returns a welcome message and server status",
         "responses": {
           "200": {
-            "description": "API is healthy and operational",
+            "description": "Server is running",
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Welcome to the Inventory Management API"
                     },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "status": {
-                              "type": "string",
-                              "example": "healthy"
-                            },
-                            "version": {
-                              "type": "string",
-                              "example": "1.0.0"
-                            },
-                            "uptime": {
-                              "type": "number",
-                              "description": "Server uptime in seconds"
-                            }
-                          }
-                        }
-                      }
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "server_status": {
+                      "type": "string",
+                      "example": "Running"
+                    },
+                    "server_time": {
+                      "type": "string",
+                      "example": "11/6/2025, 10:30:00 AM"
                     }
-                  ]
+                  }
                 },
                 "example": {
-                  "success": true,
-                  "message": "API is healthy",
-                  "timestamp": "2024-01-15T10:30:00Z",
-                  "data": {
-                    "status": "healthy",
-                    "version": "1.0.0",
-                    "uptime": 3600
-                  }
+                  "message": "Welcome to the Inventory Management API",
+                  "status": "Success",
+                  "server_status": "Running",
+                  "server_time": "11/6/2025, 10:30:00 AM"
                 }
               }
             }
@@ -584,7 +452,11 @@
                       "id": "user123",
                       "email": "user@example.com",
                       "name": "John Doe",
-                      "picture": "https://example.com/avatar.jpg",
+                      "avatar": "https://example.com/avatar.jpg",
+                      "role": "user",
+                      "isActive": true,
+                      "isBlocked": false,
+                      "lastLogin": "2024-01-15T10:30:00Z",
                       "createdAt": "2024-01-15T10:30:00Z",
                       "updatedAt": "2024-01-15T10:30:00Z"
                     }
@@ -666,15 +538,14 @@
                   "message": "Token is valid",
                   "timestamp": "2024-01-15T10:30:00Z",
                   "data": {
-                    "valid": true,
-                    "user": {
-                      "id": "user123",
-                      "email": "user@example.com",
-                      "name": "John Doe",
-                      "picture": "https://example.com/avatar.jpg",
-                      "createdAt": "2024-01-15T10:30:00Z",
-                      "updatedAt": "2024-01-15T10:30:00Z"
-                    }
+                    "id": "user123",
+                    "email": "user@example.com",
+                    "name": "John Doe",
+                    "avatar": "https://example.com/avatar.jpg",
+                    "role": "user",
+                    "isActive": true,
+                    "isBlocked": false,
+                    "lastLogin": "2024-01-15T10:30:00Z"
                   }
                 }
               }
@@ -721,15 +592,19 @@
                 },
                 "example": {
                   "success": true,
-                  "message": "Profile retrieved successfully",
+                  "message": "User profile retrieved successfully",
                   "timestamp": "2024-01-15T10:30:00Z",
                   "data": {
                     "id": "user123",
                     "email": "user@example.com",
                     "name": "John Doe",
-                    "picture": "https://example.com/avatar.jpg",
-                    "createdAt": "2024-01-15T10:30:00Z",
-                    "updatedAt": "2024-01-15T10:30:00Z"
+                    "avatar": "https://example.com/avatar.jpg",
+                    "role": "user",
+                    "isActive": true,
+                    "isBlocked": false,
+                    "lastLogin": "2024-01-15T10:30:00Z",
+                    "authProvider": "google",
+                    "isEmailVerified": true
                   }
                 }
               }
@@ -761,7 +636,8 @@
               },
               "example": {
                 "name": "John Smith",
-                "picture": "https://example.com/new-avatar.jpg"
+                "email": "john.smith@example.com",
+                "profilePicture": "https://example.com/new-avatar.jpg"
               }
             }
           }
@@ -788,15 +664,17 @@
                 },
                 "example": {
                   "success": true,
-                  "message": "Profile updated successfully",
+                  "message": "User updated successfully",
                   "timestamp": "2024-01-15T10:30:00Z",
                   "data": {
                     "id": "user123",
-                    "email": "user@example.com",
+                    "email": "john.smith@example.com",
                     "name": "John Smith",
-                    "picture": "https://example.com/new-avatar.jpg",
-                    "createdAt": "2024-01-15T10:30:00Z",
-                    "updatedAt": "2024-01-15T10:30:00Z"
+                    "avatar": "https://example.com/new-avatar.jpg",
+                    "role": "user",
+                    "isActive": true,
+                    "isBlocked": false,
+                    "lastLogin": "2024-01-15T10:30:00Z"
                   }
                 }
               }
@@ -834,8 +712,9 @@
                 },
                 "example": {
                   "success": true,
-                  "message": "Logout successful",
-                  "timestamp": "2024-01-15T10:30:00Z"
+                  "message": "Logged out successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": null
                 }
               }
             }
@@ -849,11 +728,11 @@
         }
       }
     },
-    "/api/v1/search": {
+    "/api/v1/admin/users": {
       "get": {
-        "tags": ["Search"],
-        "summary": "General web search",
-        "description": "Performs a general web search using Google",
+        "tags": ["Admin"],
+        "summary": "Get all users",
+        "description": "Retrieves a paginated list of all users in the system. Requires admin privileges with 'viewAllUsers' permission.",
         "security": [
           {
             "bearerAuth": []
@@ -861,465 +740,33 @@
         ],
         "parameters": [
           {
-            "name": "q",
+            "name": "page",
             "in": "query",
-            "required": true,
-            "description": "Search query",
+            "required": false,
+            "description": "Page number for pagination",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
             }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "Number of results to return",
+            "description": "Number of users per page",
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 50,
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Search results retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/SearchResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/web": {
-      "get": {
-        "tags": ["Search"],
-        "summary": "Web search with filters",
-        "description": "Performs a web search with additional filtering options",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": true,
-            "description": "Search query",
-            "schema": {
-              "type": "string"
+              "maximum": 100,
+              "default": 20
             }
           },
           {
-            "name": "limit",
+            "name": "search",
             "in": "query",
             "required": false,
-            "description": "Number of results to return",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50,
-              "default": 10
-            }
-          },
-          {
-            "name": "language",
-            "in": "query",
-            "required": false,
-            "description": "Language filter",
-            "schema": {
-              "type": "string",
-              "example": "en"
-            }
-          },
-          {
-            "name": "region",
-            "in": "query",
-            "required": false,
-            "description": "Region filter",
-            "schema": {
-              "type": "string",
-              "example": "us"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Web search results retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/SearchResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/images": {
-      "get": {
-        "tags": ["Search"],
-        "summary": "Image search",
-        "description": "Performs an image search using Google Images",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": true,
-            "description": "Search query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "description": "Number of results to return",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50,
-              "default": 10
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "description": "Image size filter",
-            "schema": {
-              "type": "string",
-              "enum": ["small", "medium", "large", "xlarge"]
-            }
-          },
-          {
-            "name": "color",
-            "in": "query",
-            "required": false,
-            "description": "Color filter",
-            "schema": {
-              "type": "string",
-              "enum": ["color", "gray", "mono"]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Image search results retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/ImageSearchResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/news": {
-      "get": {
-        "tags": ["Search"],
-        "summary": "News search",
-        "description": "Performs a news search using Google News",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": true,
-            "description": "Search query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "description": "Number of results to return",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50,
-              "default": 10
-            }
-          },
-          {
-            "name": "timeframe",
-            "in": "query",
-            "required": false,
-            "description": "Time range for news",
-            "schema": {
-              "type": "string",
-              "enum": ["hour", "day", "week", "month", "year"]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "News search results retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/NewsSearchResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/site": {
-      "get": {
-        "tags": ["Search"],
-        "summary": "Site-specific search",
-        "description": "Performs a search within a specific website",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": true,
-            "description": "Search query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "site",
-            "in": "query",
-            "required": true,
-            "description": "Website domain to search within",
-            "schema": {
-              "type": "string",
-              "example": "stackoverflow.com"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "description": "Number of results to return",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50,
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Site search results retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/SearchResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/advanced": {
-      "post": {
-        "tags": ["Search"],
-        "summary": "Advanced search",
-        "description": "Performs an advanced search with multiple filters and options",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdvancedSearchRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Advanced search results retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/SearchResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/suggestions": {
-      "get": {
-        "tags": ["Search"],
-        "summary": "Get search suggestions",
-        "description": "Get autocomplete suggestions for a search query",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": true,
-            "description": "Partial search query",
+            "description": "Search users by name or email",
             "schema": {
               "type": "string"
             }
@@ -1327,7 +774,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Search suggestions retrieved successfully",
+            "description": "Users retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -1339,166 +786,50 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
+                          "$ref": "#/components/schemas/UserListResponse"
                         }
                       }
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/trending": {
-      "get": {
-        "tags": ["Search"],
-        "summary": "Get trending searches",
-        "description": "Get current trending search topics",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Trending searches retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "query": {
-                                "type": "string"
-                              },
-                              "rank": {
-                                "type": "integer"
-                              },
-                              "category": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Users retrieved successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "users": [
+                      {
+                        "id": "user123",
+                        "email": "user@example.com",
+                        "name": "John Doe",
+                        "role": "user",
+                        "isActive": true,
+                        "isBlocked": false
                       }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/api/v1/search/batch": {
-      "post": {
-        "tags": ["Search"],
-        "summary": "Batch search",
-        "description": "Perform multiple searches in a single request",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "queries": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "maxItems": 10
-                  },
-                  "options": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 20,
-                        "default": 5
-                      }
+                    ],
+                    "pagination": {
+                      "page": 1,
+                      "limit": 20,
+                      "total": 50,
+                      "pages": 3
                     }
                   }
-                },
-                "required": ["queries"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Batch search results retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "query": {
-                                "type": "string"
-                              },
-                              "results": {
-                                "$ref": "#/components/schemas/SearchResult"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
                 }
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/ValidationError"
-          },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -1506,11 +837,11 @@
         }
       }
     },
-    "/api/v1/search/analytics": {
-      "get": {
-        "tags": ["Search Analytics"],
-        "summary": "Get search analytics",
-        "description": "Get search analytics for the authenticated user",
+    "/api/v1/admin/users/{userId}/block": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Block a user",
+        "description": "Blocks a specific user account. Requires admin privileges with 'blockUser' permission.",
         "security": [
           {
             "bearerAuth": []
@@ -1518,20 +849,18 @@
         ],
         "parameters": [
           {
-            "name": "timeframe",
-            "in": "query",
-            "required": false,
-            "description": "Time range for analytics",
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to block",
             "schema": {
-              "type": "string",
-              "enum": ["1d", "7d", "30d", "90d"],
-              "default": "7d"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Search analytics retrieved successfully",
+            "description": "User blocked successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -1543,17 +872,411 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SearchAnalytics"
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "isBlocked": {
+                              "type": "boolean"
+                            }
+                          }
                         }
                       }
                     }
                   ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "User blocked successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "id": "user123",
+                    "isBlocked": true
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Cannot block yourself",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userId}/unblock": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Unblock a user",
+        "description": "Unblocks a previously blocked user account. Requires admin privileges with 'unblockUser' permission.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to unblock",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User unblocked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "isBlocked": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "User unblocked successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "id": "user123",
+                    "isBlocked": false
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userId}": {
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Delete a user",
+        "description": "Permanently deletes a user account. Requires admin privileges with 'deleteUser' permission.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "User deleted successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Cannot delete yourself",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userId}/promote": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Promote user to admin",
+        "description": "Grants admin privileges to a user. Requires admin privileges with 'promoteToAdmin' permission.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to promote",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User promoted to admin successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "role": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "User promoted to admin successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "id": "user123",
+                    "role": "admin"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userId}/demote": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Demote admin to user",
+        "description": "Removes admin privileges from a user. Requires admin privileges with 'removeAdmin' permission. An admin can demote themselves.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the admin to demote",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin privileges removed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "role": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "Admin privileges removed successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "id": "user123",
+                    "role": "user"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -1576,12 +1299,8 @@
       "description": "User profile management and account information endpoints"
     },
     {
-      "name": "Search",
-      "description": "Search functionality endpoints for web, image, and news search"
-    },
-    {
-      "name": "Search Analytics",
-      "description": "Search analytics and insights endpoints"
+      "name": "Admin",
+      "description": "Administrative endpoints for user management (requires admin privileges and specific permissions)"
     }
   ],
   "x-tagGroups": [
@@ -1590,8 +1309,8 @@
       "tags": ["System", "Authentication", "User Profile"]
     },
     {
-      "name": "Search API",
-      "tags": ["Search", "Search Analytics"]
+      "name": "Administration",
+      "tags": ["Admin"]
     }
   ]
 }

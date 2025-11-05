@@ -25,16 +25,16 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Searlo API',
+      title: 'Inventory Management System API',
       version: '1.0.0',
-      description: 'API documentation for Searlo - Advanced Search Platform',
+      description: 'API documentation for Inventory Management System - A web application for managing custom inventories with flexible fields and access control',
       contact: {
-        name: 'Searlo Team',
-        email: 'support@searlo.com'
+        name: 'API Support',
+        email: 'support@inventorymanagement.com'
       },
       license: {
-        name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT'
+        name: 'ISC',
+        url: 'https://opensource.org/licenses/ISC'
       }
     },
     servers: [
@@ -59,6 +59,10 @@ const options = {
               type: 'string',
               description: 'User ID'
             },
+            id: {
+              type: 'string',
+              description: 'Virtual user ID (same as _id)'
+            },
             name: {
               type: 'string',
               description: 'User full name'
@@ -75,24 +79,34 @@ const options = {
             profilePicture: {
               type: 'string',
               format: 'uri',
-              description: 'Profile picture URL'
+              description: 'Profile picture URL (stored in database)'
+            },
+            avatar: {
+              type: 'string',
+              format: 'uri',
+              description: 'Avatar URL (virtual field - profilePicture or generated)'
             },
             authProvider: {
               type: 'string',
-              enum: ['google'],
+              enum: ['google', 'facebook'],
               description: 'Authentication provider'
+            },
+            role: {
+              type: 'string',
+              enum: ['user', 'admin'],
+              description: 'User role'
             },
             isEmailVerified: {
               type: 'boolean',
               description: 'Email verification status'
             },
-            isDeleted: {
+            isActive: {
               type: 'boolean',
-              description: 'User deletion status'
+              description: 'Account active status'
             },
-            credits: {
-              type: 'number',
-              description: 'User credits for API usage'
+            isBlocked: {
+              type: 'boolean',
+              description: 'Account blocked status'
             },
             lastLogin: {
               type: 'string',
@@ -108,65 +122,6 @@ const options = {
               type: 'string',
               format: 'date-time',
               description: 'Last update timestamp'
-            }
-          }
-        },
-        SearchResult: {
-          type: 'object',
-          properties: {
-            title: {
-              type: 'string',
-              description: 'Search result title'
-            },
-            link: {
-              type: 'string',
-              format: 'uri',
-              description: 'Search result URL'
-            },
-            snippet: {
-              type: 'string',
-              description: 'Search result snippet/description'
-            },
-            displayLink: {
-              type: 'string',
-              description: 'Display URL'
-            }
-          }
-        },
-        SearchResponse: {
-          type: 'object',
-          properties: {
-            success: {
-              type: 'boolean',
-              description: 'Request success status'
-            },
-            data: {
-              type: 'object',
-              properties: {
-                items: {
-                  type: 'array',
-                  items: {
-                    $ref: '#/components/schemas/SearchResult'
-                  }
-                },
-                searchInformation: {
-                  type: 'object',
-                  properties: {
-                    totalResults: {
-                      type: 'string',
-                      description: 'Total number of results'
-                    },
-                    searchTime: {
-                      type: 'number',
-                      description: 'Search execution time'
-                    }
-                  }
-                }
-              }
-            },
-            message: {
-              type: 'string',
-              description: 'Response message'
             }
           }
         },
@@ -212,7 +167,7 @@ const swaggerSetup = (app) => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(docsToServe, {
       explorer: true,
       customCss: '.swagger-ui .topbar { display: none }',
-      customSiteTitle: 'Searlo API Documentation',
+      customSiteTitle: 'Inventory Management API Documentation',
       swaggerOptions: {
         persistAuthorization: true,
         displayRequestDuration: true,

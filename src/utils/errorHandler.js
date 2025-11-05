@@ -31,8 +31,11 @@ const errorHandler = (err, req, res, _next) => {
     return res.status(400).json({
       success: false,
       message: 'Invalid JSON payload',
-      error: err.message,
-      details: err.body,
+      timestamp: new Date().toISOString(),
+      error: {
+        code: 'INVALID_JSON',
+        details: err.message
+      }
     });
   }
 
@@ -59,7 +62,11 @@ const errorHandler = (err, req, res, _next) => {
     return res.status(err.statusCode).json({
       success: err.success,
       message: err.message,
-      errors: err.errors,
+      timestamp: new Date().toISOString(),
+      error: {
+        code: err.code || 'ERROR',
+        details: err.errors || err.message
+      }
     });
   }
 
@@ -69,6 +76,11 @@ const errorHandler = (err, req, res, _next) => {
   res.status(500).json({
     success: false,
     message: 'Internal Server Error',
+    timestamp: new Date().toISOString(),
+    error: {
+      code: 'INTERNAL_ERROR',
+      details: 'An unexpected error occurred'
+    }
   });
 };
 
