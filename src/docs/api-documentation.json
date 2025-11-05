@@ -1,0 +1,1597 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Searlo API",
+    "description": "API documentation for Searlo - A comprehensive search application with Google OAuth authentication",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Searlo Support",
+      "email": "support@searlo.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Development server"
+    },
+    {
+      "url": "https://api.searlo.com",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token obtained from authentication endpoints"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique user identifier"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's full name"
+          },
+          "picture": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to user's profile picture"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Account creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last profile update timestamp"
+          }
+        },
+        "required": ["id", "email", "name"]
+      },
+      "UserUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "User's full name"
+          },
+          "picture": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to user's profile picture"
+          }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "snippet": {
+                  "type": "string"
+                },
+                "displayUrl": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "totalResults": {
+            "type": "integer"
+          },
+          "searchTime": {
+            "type": "number"
+          }
+        }
+      },
+      "ImageSearchResult": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "thumbnailUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "width": {
+                  "type": "integer"
+                },
+                "height": {
+                  "type": "integer"
+                },
+                "size": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "totalResults": {
+            "type": "integer"
+          }
+        }
+      },
+      "NewsSearchResult": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "snippet": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "publishedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "imageUrl": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "totalResults": {
+            "type": "integer"
+          }
+        }
+      },
+      "AdvancedSearchRequest": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "exactPhrase": {
+            "type": "string"
+          },
+          "anyWords": {
+            "type": "string"
+          },
+          "excludeWords": {
+            "type": "string"
+          },
+          "site": {
+            "type": "string"
+          },
+          "fileType": {
+            "type": "string"
+          },
+          "dateRange": {
+            "type": "string",
+            "enum": ["day", "week", "month", "year"]
+          },
+          "language": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 10
+          }
+        },
+        "required": ["query"]
+      },
+      "SearchAnalytics": {
+        "type": "object",
+        "properties": {
+          "totalSearches": {
+            "type": "integer"
+          },
+          "topQueries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "searchTrends": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "count": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "averageResponseTime": {
+            "type": "number"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indicates if the request was successful"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable message describing the result"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of the response"
+          }
+        },
+        "required": ["success", "message", "timestamp"]
+      },
+      "ErrorResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Error code for programmatic handling"
+                  },
+                  "details": {
+                    "type": "string",
+                    "description": "Detailed error information"
+                  }
+                },
+                "required": ["code"]
+              }
+            },
+            "required": ["error"]
+          }
+        ]
+      },
+      "ValidationError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "validationErrors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "Field that failed validation"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Validation error message"
+                    },
+                    "value": {
+                      "description": "The invalid value that was provided"
+                    }
+                  },
+                  "required": ["field", "message"]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Authentication required or invalid token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "message": "Authentication required",
+              "timestamp": "2024-01-15T10:30:00Z",
+              "error": {
+                "code": "UNAUTHORIZED",
+                "details": "Valid JWT token required"
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Request validation failed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "example": {
+              "success": false,
+              "message": "Validation failed",
+              "timestamp": "2024-01-15T10:30:00Z",
+              "error": {
+                "code": "VALIDATION_ERROR",
+                "details": "One or more fields contain invalid data"
+              },
+              "validationErrors": [
+                {
+                  "field": "email",
+                  "message": "Must be a valid email address",
+                  "value": "invalid-email"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "message": "Internal server error",
+              "timestamp": "2024-01-15T10:30:00Z",
+              "error": {
+                "code": "INTERNAL_ERROR",
+                "details": "An unexpected error occurred"
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "LimitParam": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum number of results to return",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10
+        }
+      },
+      "OffsetParam": {
+        "name": "offset",
+        "in": "query",
+        "description": "Number of results to skip",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      }
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["System"],
+        "summary": "API Health Check",
+        "description": "Returns the health status of the API",
+        "responses": {
+          "200": {
+            "description": "API is healthy and operational",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "status": {
+                              "type": "string",
+                              "example": "healthy"
+                            },
+                            "version": {
+                              "type": "string",
+                              "example": "1.0.0"
+                            },
+                            "uptime": {
+                              "type": "number",
+                              "description": "Server uptime in seconds"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "API is healthy",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "status": "healthy",
+                    "version": "1.0.0",
+                    "uptime": 3600
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/google": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Initiate Google OAuth",
+        "description": "Redirects user to Google OAuth consent screen for authentication",
+        "responses": {
+          "302": {
+            "description": "Redirect to Google OAuth consent screen",
+            "headers": {
+              "Location": {
+                "description": "Google OAuth URL",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/user/google/callback": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Google OAuth Callback",
+        "description": "Handles the callback from Google OAuth and issues JWT token",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "description": "Authorization code from Google",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "description": "State parameter for CSRF protection",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authentication successful, JWT token issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "token": {
+                              "type": "string",
+                              "description": "JWT access token"
+                            },
+                            "user": {
+                              "$ref": "#/components/schemas/User"
+                            }
+                          },
+                          "required": ["token", "user"]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "Authentication successful",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "user": {
+                      "id": "user123",
+                      "email": "user@example.com",
+                      "name": "John Doe",
+                      "picture": "https://example.com/avatar.jpg",
+                      "createdAt": "2024-01-15T10:30:00Z",
+                      "updatedAt": "2024-01-15T10:30:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "description": "Authentication failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Authentication failed",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "error": {
+                    "code": "AUTH_FAILED",
+                    "details": "Invalid authorization code"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/user/verify": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Verify JWT Token",
+        "description": "Verifies the validity of a JWT token and returns user information",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token is valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "valid": {
+                              "type": "boolean",
+                              "example": true
+                            },
+                            "user": {
+                              "$ref": "#/components/schemas/User"
+                            }
+                          },
+                          "required": ["valid", "user"]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "Token is valid",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "valid": true,
+                    "user": {
+                      "id": "user123",
+                      "email": "user@example.com",
+                      "name": "John Doe",
+                      "picture": "https://example.com/avatar.jpg",
+                      "createdAt": "2024-01-15T10:30:00Z",
+                      "updatedAt": "2024-01-15T10:30:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/user/profile": {
+      "get": {
+        "tags": ["User Profile"],
+        "summary": "Get Current User Profile",
+        "description": "Retrieves the profile information of the currently authenticated user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "Profile retrieved successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "id": "user123",
+                    "email": "user@example.com",
+                    "name": "John Doe",
+                    "picture": "https://example.com/avatar.jpg",
+                    "createdAt": "2024-01-15T10:30:00Z",
+                    "updatedAt": "2024-01-15T10:30:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": ["User Profile"],
+        "summary": "Update User Profile",
+        "description": "Updates the profile information of the currently authenticated user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateRequest"
+              },
+              "example": {
+                "name": "John Smith",
+                "picture": "https://example.com/new-avatar.jpg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "Profile updated successfully",
+                  "timestamp": "2024-01-15T10:30:00Z",
+                  "data": {
+                    "id": "user123",
+                    "email": "user@example.com",
+                    "name": "John Smith",
+                    "picture": "https://example.com/new-avatar.jpg",
+                    "createdAt": "2024-01-15T10:30:00Z",
+                    "updatedAt": "2024-01-15T10:30:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/user/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User Logout",
+        "description": "Logs out the current user by invalidating their JWT token",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Logout successful",
+                  "timestamp": "2024-01-15T10:30:00Z"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "General web search",
+        "description": "Performs a general web search using Google",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SearchResult"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/web": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Web search with filters",
+        "description": "Performs a web search with additional filtering options",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "description": "Language filter",
+            "schema": {
+              "type": "string",
+              "example": "en"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "description": "Region filter",
+            "schema": {
+              "type": "string",
+              "example": "us"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Web search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SearchResult"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/images": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Image search",
+        "description": "Performs an image search using Google Images",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "description": "Image size filter",
+            "schema": {
+              "type": "string",
+              "enum": ["small", "medium", "large", "xlarge"]
+            }
+          },
+          {
+            "name": "color",
+            "in": "query",
+            "required": false,
+            "description": "Color filter",
+            "schema": {
+              "type": "string",
+              "enum": ["color", "gray", "mono"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ImageSearchResult"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/news": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "News search",
+        "description": "Performs a news search using Google News",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "name": "timeframe",
+            "in": "query",
+            "required": false,
+            "description": "Time range for news",
+            "schema": {
+              "type": "string",
+              "enum": ["hour", "day", "week", "month", "year"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "News search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/NewsSearchResult"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/site": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Site-specific search",
+        "description": "Performs a search within a specific website",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "site",
+            "in": "query",
+            "required": true,
+            "description": "Website domain to search within",
+            "schema": {
+              "type": "string",
+              "example": "stackoverflow.com"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Site search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SearchResult"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/advanced": {
+      "post": {
+        "tags": ["Search"],
+        "summary": "Advanced search",
+        "description": "Performs an advanced search with multiple filters and options",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdvancedSearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Advanced search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SearchResult"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/suggestions": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Get search suggestions",
+        "description": "Get autocomplete suggestions for a search query",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Partial search query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search suggestions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/trending": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Get trending searches",
+        "description": "Get current trending search topics",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trending searches retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "query": {
+                                "type": "string"
+                              },
+                              "rank": {
+                                "type": "integer"
+                              },
+                              "category": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/batch": {
+      "post": {
+        "tags": ["Search"],
+        "summary": "Batch search",
+        "description": "Perform multiple searches in a single request",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "queries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 10
+                  },
+                  "options": {
+                    "type": "object",
+                    "properties": {
+                      "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 20,
+                        "default": 5
+                      }
+                    }
+                  }
+                },
+                "required": ["queries"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "query": {
+                                "type": "string"
+                              },
+                              "results": {
+                                "$ref": "#/components/schemas/SearchResult"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/search/analytics": {
+      "get": {
+        "tags": ["Search Analytics"],
+        "summary": "Get search analytics",
+        "description": "Get search analytics for the authenticated user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "timeframe",
+            "in": "query",
+            "required": false,
+            "description": "Time range for analytics",
+            "schema": {
+              "type": "string",
+              "enum": ["1d", "7d", "30d", "90d"],
+              "default": "7d"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search analytics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SearchAnalytics"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "System",
+      "description": "System health and status endpoints"
+    },
+    {
+      "name": "Authentication",
+      "description": "User authentication and authorization endpoints using Google OAuth 2.0 and JWT tokens"
+    },
+    {
+      "name": "User Profile",
+      "description": "User profile management and account information endpoints"
+    },
+    {
+      "name": "Search",
+      "description": "Search functionality endpoints for web, image, and news search"
+    },
+    {
+      "name": "Search Analytics",
+      "description": "Search analytics and insights endpoints"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Core API",
+      "tags": ["System", "Authentication", "User Profile"]
+    },
+    {
+      "name": "Search API",
+      "tags": ["Search", "Search Analytics"]
+    }
+  ]
+}
