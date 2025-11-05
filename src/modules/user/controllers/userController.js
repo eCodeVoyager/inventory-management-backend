@@ -22,12 +22,19 @@ const googleCallback = catchAsync(async (req, res, _next) => {
 
     if (!user) {
       console.error('Google OAuth failed - no user found in req.user');
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=oauth_failed`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=oauth_failed`
+      );
     }
 
     if (!user._id || !user.email) {
-      console.error('Google OAuth failed - incomplete user data:', { id: user._id, email: user.email });
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=auth_failed`);
+      console.error('Google OAuth failed - incomplete user data:', {
+        id: user._id,
+        email: user.email,
+      });
+      return res.redirect(
+        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=auth_failed`
+      );
     }
 
     let token;
@@ -35,7 +42,9 @@ const googleCallback = catchAsync(async (req, res, _next) => {
       token = generateAccessToken(user);
     } catch (tokenError) {
       console.error('JWT token generation failed:', tokenError);
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=server_error`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=server_error`
+      );
     }
 
     try {
@@ -46,7 +55,7 @@ const googleCallback = catchAsync(async (req, res, _next) => {
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const redirectUrl = `${frontendUrl}/auth/callback?token=${token}`;
-    
+
     return res.redirect(redirectUrl);
   } catch (error) {
     console.error('Google callback error:', error);
@@ -106,7 +115,10 @@ const updateUser = catchAsync(async (req, res) => {
 
   // Validate input
   if (!name && !email && !profilePicture) {
-    throw new ApiError(status.BAD_REQUEST, 'At least one field (name, email, or profilePicture) is required');
+    throw new ApiError(
+      status.BAD_REQUEST,
+      'At least one field (name, email, or profilePicture) is required'
+    );
   }
 
   // Only allow safe fields to be updated

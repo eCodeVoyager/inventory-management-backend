@@ -12,7 +12,11 @@ router.get('/users', adminController.getAllUsers);
 router.patch('/users/:userId/block', authorize(['blockUser']), adminController.blockUser);
 router.patch('/users/:userId/unblock', authorize(['unblockUser']), adminController.unblockUser);
 router.delete('/users/:userId', authorize(['deleteUser']), adminController.deleteUser);
-router.patch('/users/:userId/promote', authorize(['promoteToAdmin']), adminController.promoteToAdmin);
+router.patch(
+  '/users/:userId/promote',
+  authorize(['promoteToAdmin']),
+  adminController.promoteToAdmin
+);
 router.patch('/users/:userId/demote', authorize(['removeAdmin']), adminController.removeAdmin);
 
 module.exports = router;
