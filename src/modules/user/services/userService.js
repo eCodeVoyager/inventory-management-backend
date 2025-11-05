@@ -91,7 +91,7 @@ const getUserByGoogleId = async (googleId) => {
  * @param {Object} updateData - Data to update
  * @returns {Promise<Object|null>} Updated user or null
  */
-const updateUserById = async (userId, updateData) => {
+const updateUserById = async (userId, updateData, isAdmin = false) => {
   try {
     if (!userId) {
       throw new ApiError(status.BAD_REQUEST, 'User ID is required');
@@ -101,18 +101,18 @@ const updateUserById = async (userId, updateData) => {
       throw new ApiError(status.BAD_REQUEST, 'Update data is required');
     }
     
-    // Whitelist of fields that can be updated by users
-    const allowedFields = ['name', 'email', 'profilePicture'];
+    const allowedFields = isAdmin 
+      ? ['name', 'email', 'profilePicture', 'role', 'isActive', 'isBlocked']
+      : ['name', 'email', 'profilePicture'];
+    
     const sanitizedUpdate = {};
     
-    // Only allow whitelisted fields
     for (const field of allowedFields) {
       if (updateData[field] !== undefined) {
         sanitizedUpdate[field] = updateData[field];
       }
     }
     
-    // Prevent updating protected fields
     if (Object.keys(sanitizedUpdate).length === 0) {
       throw new ApiError(status.BAD_REQUEST, 'No valid fields to update');
     }
@@ -141,8 +141,6 @@ const createOrUpdateGoogleUser = async (googleProfile) => {
     const { googleId, email, name, profilePicture } = googleProfile;
     const normalizedEmail = email.toLowerCase();
     
-    // Use findOneAndUpdate with upsert for atomic operation
-    // This prevents race conditions when multiple requests come simultaneously
     const user = await User.findOneAndUpdate(
       { $or: [{ googleId }, { email: normalizedEmail }] },
       {
@@ -153,15 +151,14 @@ const createOrUpdateGoogleUser = async (googleProfile) => {
           authProvider: 'google',
           isEmailVerified: true,
           profilePicture,
-          credits: 2500,
+          role: 'user',
           isActive: true,
+          isBlocked: false,
           createdAt: new Date()
         },
         $set: {
           lastLogin: new Date(),
-          // Update Google ID if user was found by email but didn't have googleId
           ...(googleId && { googleId }),
-          // Update profile picture if not set
           ...(!profilePicture && profilePicture && { profilePicture })
         }
       },
@@ -175,12 +172,10 @@ const createOrUpdateGoogleUser = async (googleProfile) => {
     
     return user;
   } catch (error) {
-    // Handle duplicate key errors gracefully
     if (error.code === 11000) {
       const { googleId, email } = googleProfile;
       const normalizedEmail = email.toLowerCase();
       
-      // If duplicate, try to fetch the existing user
       const existingUser = await User.findOne({
         $or: [{ googleId }, { email: normalizedEmail }]
       });
@@ -218,6 +213,48 @@ const updateLastLogin = async (userId) => {
   }
 };
 
+const getAllUsers = async (query = {}, options = {}) => {
+  try {
+    const { page = 1, limit = 20, sort = { createdAt: -1 } } = options;
+    
+    const users = await User.find(query)
+      .select('-__v')
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    const total = await User.countDocuments(query);
+
+    return {
+      users,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    };
+  } catch (error) {
+    throw new ApiError(status.INTERNAL_SERVER_ERROR, error.message);
+  }
+};
+
+const deleteUserById = async (userId) => {
+  try {
+    if (!userId) {
+      throw new ApiError(status.BAD_REQUEST, 'User ID is required');
+    }
+    const result = await User.findByIdAndDelete(userId);
+    return result;
+  } catch (error) {
+    if (error.name === 'CastError') {
+      throw new ApiError(status.BAD_REQUEST, 'Invalid user ID format');
+    }
+    throw error instanceof ApiError ? error : new ApiError(status.INTERNAL_SERVER_ERROR, error.message);
+  }
+};
+
 module.exports = {
   createUser,
   getUser: getUserByQuery,
@@ -228,4 +265,6 @@ module.exports = {
   updateUserById,
   createOrUpdateGoogleUser,
   updateLastLogin,
+  getAllUsers,
+  deleteUserById,
 };

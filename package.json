@@ -1,7 +1,7 @@
 {
-  "name": "searlo_backend",
+  "name": "inventory-management-backend",
   "version": "1.0.0",
-  "description": "Simplified backend for Searlo application",
+  "description": "Backend API for Inventory Management System - A web application for managing custom inventories with flexible fields and access control",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -14,9 +14,13 @@
     "check-format": "prettier --check \"**/*.{js,json,md}\""
   },
   "keywords": [
-    "searlo",
+    "inventory",
+    "management",
     "backend",
-    "api"
+    "api",
+    "express",
+    "mongodb",
+    "oauth"
   ],
   "author": "",
   "license": "ISC",

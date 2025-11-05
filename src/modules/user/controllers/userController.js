@@ -18,47 +18,39 @@ const googleAuth = passport.authenticate('google', {
  */
 const googleCallback = catchAsync(async (req, res, _next) => {
   try {
-    // At this point, passport.authenticate has already been called in the route
-    // and req.user should contain the authenticated user
     const user = req.user;
 
     if (!user) {
       console.error('Google OAuth failed - no user found in req.user');
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth?error=oauth_failed`);
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=oauth_failed`);
     }
 
-    // Validate user data before token generation
     if (!user._id || !user.email) {
       console.error('Google OAuth failed - incomplete user data:', { id: user._id, email: user.email });
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth?error=auth_failed`);
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=auth_failed`);
     }
 
-    // Generate JWT token with error handling
     let token;
     try {
       token = generateAccessToken(user);
     } catch (tokenError) {
       console.error('JWT token generation failed:', tokenError);
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth?error=server_error`);
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth?error=server_error`);
     }
 
-    // Update last login with error handling
     try {
       await userService.updateLastLogin(user._id);
     } catch (updateError) {
       console.warn('Failed to update last login:', updateError);
-      // Don't fail the authentication for this non-critical error
     }
 
-    // Redirect to frontend with token
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const redirectUrl = `${frontendUrl}/auth/callback?token=${token}`;
     
-    console.log('OAuth success - redirecting to:', redirectUrl);
     return res.redirect(redirectUrl);
   } catch (error) {
     console.error('Google callback error:', error);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     return res.redirect(`${frontendUrl}/auth?error=server_error`);
   }
 });
@@ -90,8 +82,9 @@ const verifyToken = catchAsync(async (req, res) => {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      credits: user.credits,
+      role: user.role,
       isActive: user.isActive,
+      isBlocked: user.isBlocked,
       lastLogin: user.lastLogin,
     };
 
@@ -133,8 +126,9 @@ const updateUser = catchAsync(async (req, res) => {
     email: updatedUser.email,
     name: updatedUser.name,
     avatar: updatedUser.avatar,
-    credits: updatedUser.credits,
+    role: updatedUser.role,
     isActive: updatedUser.isActive,
+    isBlocked: updatedUser.isBlocked,
     lastLogin: updatedUser.lastLogin,
   };
 
@@ -157,8 +151,9 @@ const getCurrentUser = catchAsync(async (req, res) => {
     email: user.email,
     name: user.name,
     avatar: user.avatar,
-    credits: user.credits,
+    role: user.role,
     isActive: user.isActive,
+    isBlocked: user.isBlocked,
     lastLogin: user.lastLogin,
     authProvider: user.authProvider,
     isEmailVerified: user.isEmailVerified,
@@ -171,8 +166,6 @@ const getCurrentUser = catchAsync(async (req, res) => {
  * Logout user (client-side token removal)
  */
 const logout = catchAsync(async (req, res) => {
-  // Since we're using stateless JWT, logout is handled client-side
-  // This endpoint can be used for logging purposes or token blacklisting if needed
   res.json(new ApiResponse(status.OK, null, 'Logged out successfully'));
 });
 

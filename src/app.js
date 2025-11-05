@@ -100,21 +100,18 @@ app.disable('x-powered-by');
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Base route
 app.get('/', (_, res) => {
   res.json({
-    message: 'Welcome to the Searlo API😀',
-    status: 'Success✅',
-    server_status: 'Working🆙',
-    server_time: `${new Date().toLocaleString()} ⌛`,
+    message: 'Welcome to the Inventory Management API',
+    status: 'Success',
+    server_status: 'Running',
+    server_time: new Date().toLocaleString(),
   });
 });
 
 // API Routes
 app.use('/api/v1/user', routeIndex.user.userRoutes);
-app.use('/api/v1/search', routeIndex.search.searchRoutes);
-app.use('/api/v1/credits', routeIndex.credit.routes);
-
+app.use('/api/v1/admin', routeIndex.user.adminRoutes);
 
 // Setup Swagger Documentation
 swaggerSetup(app);

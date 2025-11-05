@@ -43,17 +43,18 @@ const authenticate = async (req, res, next) => {
       return next(new ApiError(status.UNAUTHORIZED, 'User not found'));
     }
 
-    // Check if the user account is active
     if (user.isActive === false) {
       return next(new ApiError(status.FORBIDDEN, 'Account is disabled'));
     }
 
-    // Check if user is deleted (soft-delete)
+    if (user.isBlocked === true) {
+      return next(new ApiError(status.FORBIDDEN, 'Account has been blocked by administrator'));
+    }
+
     if (user.deleted) {
       return next(new ApiError(status.UNAUTHORIZED, 'User account has been removed'));
     }
 
-    // Set user in request for Google OAuth users
     req.user = user;
     next();
   } catch (err) {
