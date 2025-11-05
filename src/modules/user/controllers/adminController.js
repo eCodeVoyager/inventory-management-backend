@@ -41,7 +41,7 @@ const blockUser = catchAsync(async (req, res) => {
   res.json(
     new ApiResponse(
       status.OK,
-      { id: user._id, isBlocked: user.isBlocked },
+      { id: user.id, isBlocked: user.isBlocked },
       'User blocked successfully'
     )
   );
@@ -59,7 +59,7 @@ const unblockUser = catchAsync(async (req, res) => {
   res.json(
     new ApiResponse(
       status.OK,
-      { id: user._id, isBlocked: user.isBlocked },
+      { id: user.id, isBlocked: user.isBlocked },
       'User unblocked successfully'
     )
   );
@@ -93,7 +93,7 @@ const promoteToAdmin = catchAsync(async (req, res) => {
   res.json(
     new ApiResponse(
       status.OK,
-      { id: user._id, role: user.role },
+      { id: user.id, role: user.role },
       'User promoted to admin successfully'
     )
   );
@@ -111,7 +111,7 @@ const removeAdmin = catchAsync(async (req, res) => {
   res.json(
     new ApiResponse(
       status.OK,
-      { id: user._id, role: user.role },
+      { id: user.id, role: user.role },
       'Admin privileges removed successfully'
     )
   );

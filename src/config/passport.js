@@ -41,7 +41,7 @@ passport.use(
         });
 
         console.log('Google OAuth user processed successfully:', {
-          id: user._id,
+          id: user.id,
           email: user.email,
           name: user.name
         });
@@ -57,7 +57,7 @@ passport.use(
 
 // Serialize user for the session (not used with JWT but required by passport)
 passport.serializeUser((user, done) => {
-  done(null, user._id);
+  done(null, user.id);
 });
 
 // Deserialize user from the session (not used with JWT but required by passport)

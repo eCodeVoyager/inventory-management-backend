@@ -1,74 +1,117 @@
-const mongoose = require('mongoose');
+const { DataTypes, Model } = require('sequelize');
+const { sequelize } = require('../../../config/db');
 
-const userSchema = new mongoose.Schema(
+class User extends Model {
+  // Virtual getter for avatar
+  get avatar() {
+    return (
+      this.profilePicture ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(this.name)}&background=0D8ABC&color=fff`
+    );
+  }
+
+  // Method to get plain user object with virtuals
+  toJSON() {
+    const values = { ...this.get() };
+    // Add virtual fields
+    values.avatar = this.avatar;
+    return values;
+  }
+}
+
+User.init(
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
+    },
     name: {
-      type: String,
-      required: true,
-      trim: true,
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+      set(value) {
+        this.setDataValue('name', value?.trim());
+      },
     },
     email: {
-      type: String,
-      required: true,
+      type: DataTypes.STRING(255),
+      allowNull: false,
       unique: true,
-      lowercase: true,
-      trim: true,
+      validate: {
+        isEmail: true,
+        notEmpty: true,
+      },
+      set(value) {
+        this.setDataValue('email', value?.toLowerCase().trim());
+      },
     },
     googleId: {
-      type: String,
+      type: DataTypes.STRING(255),
+      allowNull: true,
       unique: true,
-      sparse: true,
     },
     profilePicture: {
-      type: String,
-      default: null,
+      type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: null,
     },
     authProvider: {
-      type: String,
-      enum: ['google', 'facebook'],
-      default: 'google',
+      type: DataTypes.ENUM('google', 'facebook'),
+      allowNull: false,
+      defaultValue: 'google',
     },
     role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user',
+      type: DataTypes.ENUM('user', 'admin'),
+      allowNull: false,
+      defaultValue: 'user',
     },
     isEmailVerified: {
-      type: Boolean,
-      default: false,
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     isActive: {
-      type: Boolean,
-      default: true,
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
     isBlocked: {
-      type: Boolean,
-      default: false,
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     lastLogin: {
-      type: Date,
-      default: null,
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
     },
   },
   {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users',
     timestamps: true,
+    underscored: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ['email'],
+      },
+      {
+        unique: true,
+        fields: ['googleId'],
+        where: {
+          googleId: {
+            [require('sequelize').Op.ne]: null,
+          },
+        },
+      },
+    ],
   }
 );
-
-userSchema.virtual('avatar').get(function () {
-  return (
-    this.profilePicture ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(this.name)}&background=0D8ABC&color=fff`
-  );
-});
-
-userSchema.virtual('id').get(function () {
-  return this._id.toHexString();
-});
-
-userSchema.set('toJSON', { virtuals: true });
-userSchema.set('toObject', { virtuals: true });
-
-const User = mongoose.model('User', userSchema);
 
 module.exports = User;

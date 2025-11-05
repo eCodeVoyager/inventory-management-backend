@@ -27,9 +27,9 @@ const googleCallback = catchAsync(async (req, res, _next) => {
       );
     }
 
-    if (!user._id || !user.email) {
+    if (!user.id || !user.email) {
       console.error('Google OAuth failed - incomplete user data:', {
-        id: user._id,
+        id: user.id,
         email: user.email,
       });
       return res.redirect(
@@ -48,7 +48,7 @@ const googleCallback = catchAsync(async (req, res, _next) => {
     }
 
     try {
-      await userService.updateLastLogin(user._id);
+      await userService.updateLastLogin(user.id);
     } catch (updateError) {
       console.warn('Failed to update last login:', updateError);
     }
@@ -87,7 +87,7 @@ const verifyToken = catchAsync(async (req, res) => {
     }
 
     const userData = {
-      id: user._id,
+      id: user.id,
       email: user.email,
       name: user.name,
       avatar: user.avatar,
@@ -134,7 +134,7 @@ const updateUser = catchAsync(async (req, res) => {
   }
 
   const userData = {
-    id: updatedUser._id,
+    id: updatedUser.id,
     email: updatedUser.email,
     name: updatedUser.name,
     avatar: updatedUser.avatar,
@@ -159,7 +159,7 @@ const getCurrentUser = catchAsync(async (req, res) => {
   }
 
   const userData = {
-    id: user._id,
+    id: user.id,
     email: user.email,
     name: user.name,
     avatar: user.avatar,

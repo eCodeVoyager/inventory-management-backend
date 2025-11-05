@@ -29,10 +29,11 @@ const router = express.Router();
  *         description: Redirect to Google OAuth
  */
 // Google OAuth routes
-router.get('/google', 
-  passport.authenticate('google', { 
+router.get(
+  '/google',
+  passport.authenticate('google', {
     scope: ['profile', 'email'],
-    session: false 
+    session: false,
   })
 );
 
@@ -60,10 +61,11 @@ router.get('/google',
  *       400:
  *         description: OAuth authentication failed
  */
-router.get('/google/callback',
-  passport.authenticate('google', { 
+router.get(
+  '/google/callback',
+  passport.authenticate('google', {
     session: false,
-    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth?error=auth_failed`
+    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth?error=auth_failed`,
   }),
   userController.googleCallback
 );
@@ -201,10 +203,7 @@ router.get('/profile', userController.getCurrentUser);
  *               $ref: '#/components/schemas/Error'
  */
 // Update user profile
-router.put('/profile', 
-  validateRequest(updateUserSchema),
-  userController.updateUser
-);
+router.put('/profile', validateRequest(updateUserSchema), userController.updateUser);
 
 /**
  * @swagger

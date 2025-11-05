@@ -10,16 +10,19 @@ const envCheck = checkEnvVariables(true);
 if (envCheck.success) {
   ConnectDB()
     .then(async () => {
-      console.log('✅ Connected to MongoDB');
+      console.log('✅ Connected to PostgreSQL');
 
       const PORT = process.env.PORT || 3000;
-      server.listen(PORT, () => {
-        console.log(`🚀 Server is running on port ${PORT}`);
-      }).on('error', (error) => {
-        console.error('Server failed to start:', error);
-        console.error('Server startup error details:', error);
-        process.exit(1);
-      });
+      server
+        .listen(PORT, () => {
+          console.log(`🚀 Server is running on port ${PORT}`);
+        })
+        .on('error', error => {
+          console.error('Server failed to start:', error);
+          console.error('Server startup error details:', error);
+          process.exit(1);
+        });
+
       ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => {
         process.on(signal, async () => {
           console.log(`\n🛑 Received ${signal}. Shutting down gracefully...`);
@@ -27,6 +30,10 @@ if (envCheck.success) {
           // First, wait for workers to clean up (handled in initialize.js)
           console.log('Waiting for workers to finish...');
           await new Promise(resolve => setTimeout(resolve, 5000));
+
+          // Then close the database connection
+          const { closeDB } = require('./config/db');
+          await closeDB();
 
           // Then close the server
           console.log('Closing HTTP server...');

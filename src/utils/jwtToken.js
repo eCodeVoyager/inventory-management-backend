@@ -9,9 +9,9 @@ const jwt = require('jsonwebtoken');
  */
 const generateAccessToken = user => {
   const payload = {
-    id: user._id,
+    id: user.id,
     email: user.email,
-    role: user.role?.name || 'user', // Safe access with fallback
+    role: user.role?.name || user.role || 'user', // Safe access with fallback
     messId: user.messId ? user.messId : null,
     type: 'access',
     iat: Math.floor(Date.now() / 1000),
@@ -30,7 +30,7 @@ const generateAccessToken = user => {
  */
 const generateRefreshToken = user => {
   const payload = {
-    id: user._id,
+    id: user.id,
     type: 'refresh',
     iat: Math.floor(Date.now() / 1000),
   };
@@ -48,7 +48,7 @@ const generateRefreshToken = user => {
  */
 const genInviteToken = user => {
   const payload = {
-    inviterId: user._id,
+    inviterId: user.id,
     organizationId: user.organizationId ? user.organizationId : null,
     email: user.email,
     roleId: user.roleId,

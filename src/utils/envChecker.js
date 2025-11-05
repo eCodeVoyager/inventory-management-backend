@@ -10,14 +10,14 @@ dotenv.config();
  */
 const checkEnvVariables = (enforceRequired = false) => {
   const criticalVariables = [
-    'MONGO_URI',
-    'REFRESH_TOKEN_SECRET',
+    'DB_HOST',
+    'DB_PORT',
+    'DB_NAME',
+    'DB_USER',
+    'DB_PASSWORD',
     'ACCESS_TOKEN_SECRET',
-    'ACCESS_TOKEN_LIFE',
-    'REFRESH_TOKEN_LIFE',
     'PORT',
     'NODE_ENV',
-    'LOGGER_LEVEL',
   ];
 
   // Important but not strictly required
