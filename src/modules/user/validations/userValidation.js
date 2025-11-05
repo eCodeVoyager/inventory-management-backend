@@ -6,56 +6,16 @@ const updateUserSchema = Joi.object({
     .min(2)
     .max(50)
     .trim()
-    .pattern(/^[a-zA-Z\s]+$/)
     .messages({
       'string.min': 'Name must be at least 2 characters long',
       'string.max': 'Name cannot exceed 50 characters',
-      'string.pattern.base': 'Name can only contain letters and spaces'
     }),
-  
-  profilePicture: Joi.string()
-    .uri()
-    .messages({
-      'string.uri': 'Profile picture must be a valid URL'
-    }),
-  
-  isActive: Joi.boolean()
-});
 
-// Validation schema for Google OAuth callback data
-const googleAuthSchema = Joi.object({
-  googleId: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'Google ID is required',
-      'string.empty': 'Google ID cannot be empty'
-    }),
-  
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({
-      'any.required': 'Email is required',
-      'string.email': 'Please provide a valid email address'
-    }),
-  
-  name: Joi.string()
-    .min(2)
-    .max(50)
-    .required()
-    .trim()
-    .messages({
-      'any.required': 'Name is required',
-      'string.min': 'Name must be at least 2 characters long',
-      'string.max': 'Name cannot exceed 50 characters'
-    }),
-  
   profilePicture: Joi.string()
     .uri()
-    .allow('')
     .messages({
       'string.uri': 'Profile picture must be a valid URL'
-    })
+    }),
 });
 
 // Validation schema for JWT token verification
@@ -120,7 +80,6 @@ const validateQuery = (schema) => {
 
 module.exports = {
   updateUserSchema,
-  googleAuthSchema,
   tokenSchema,
   validateRequest,
   validateQuery

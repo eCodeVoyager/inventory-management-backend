@@ -11,7 +11,7 @@ const loadComprehensiveApiDocs = () => {
     const docsContent = fs.readFileSync(docsPath, 'utf8');
     return JSON.parse(docsContent);
   } catch (error) {
-    console.warn('⚠️ Could not load comprehensive API documentation, falling back to generated docs');
+    console.warn('Could not load comprehensive API documentation, falling back to generated docs');
     return null;
   }
 };
@@ -25,12 +25,12 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Searlo API',
+      title: 'Inventory Management API',
       version: '1.0.0',
-      description: 'API documentation for Searlo - Advanced Search Platform',
+      description: 'API documentation for Inventory Management System',
       contact: {
-        name: 'Searlo Team',
-        email: 'support@searlo.com'
+        name: 'Development Team',
+        email: 'support@inventory.com'
       },
       license: {
         name: 'MIT',
@@ -212,7 +212,7 @@ const swaggerSetup = (app) => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(docsToServe, {
       explorer: true,
       customCss: '.swagger-ui .topbar { display: none }',
-      customSiteTitle: 'Searlo API Documentation',
+      customSiteTitle: 'Inventory Management API Documentation',
       swaggerOptions: {
         persistAuthorization: true,
         displayRequestDuration: true,
@@ -286,14 +286,14 @@ const swaggerSetup = (app) => {
       });
     });
     
-    console.log('📚 API Documentation available at /api-docs');
-    console.log('📄 JSON specification available at /api-docs.json');
-    console.log('🏥 Documentation health check at /api-docs/health');
-    
+    console.log('API Documentation available at /api-docs');
+    console.log('JSON specification available at /api-docs.json');
+    console.log('Documentation health check at /api-docs/health');
+
     if (comprehensiveApiDocs) {
-      console.log('✅ Using comprehensive API documentation');
+      console.log('Using comprehensive API documentation');
     } else {
-      console.log('⚠️ Using fallback generated documentation');
+      console.log('Using fallback generated documentation');
     }
   }
 };

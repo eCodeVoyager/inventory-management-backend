@@ -13,23 +13,23 @@ const ConnectDB = async () => {
       socketTimeoutMS: 30000,
     });
 
-    console.log(`🎯 MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
 
     mongoose.connection.on('disconnected', () => {
-      console.warn('⚠️ MongoDB disconnected');
+      console.warn('MongoDB disconnected');
     });
 
     mongoose.connection.on('error', err => {
-      console.error(`❌ MongoDB connection error: ${err}`);
+      console.error(`MongoDB connection error: ${err}`);
     });
 
     mongoose.connection.on('reconnected', () => {
-      console.log('✅ MongoDB reconnected');
+      console.log('MongoDB reconnected');
     });
 
     return conn;
   } catch (error) {
-    console.error(`❌ MongoDB connection error: ${error.message}`);
+    console.error(`MongoDB connection error: ${error.message}`);
     throw error;
   }
 };

@@ -29,7 +29,7 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
-// ===== 🌐 CORS Middleware Setup =====
+// CORS Middleware Setup
 const allowedOrigins = process.env.FRONTEND_URL_CORS?.split(',').map(origin => origin.trim());
 
 app.use(
@@ -52,7 +52,7 @@ app.use(
   })
 );
 
-// ===== Middlewares =====
+// Middlewares
 const allMiddlewares = [
   morgan(process.env.LOGGER_LEVEL === 'development' ? 'dev' : 'combined'),
   helmet({
@@ -103,17 +103,15 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Base route
 app.get('/', (_, res) => {
   res.json({
-    message: 'Welcome to the Searlo API😀',
-    status: 'Success✅',
-    server_status: 'Working🆙',
-    server_time: `${new Date().toLocaleString()} ⌛`,
+    message: 'Welcome to the Inventory Management API',
+    status: 'Success',
+    server_status: 'Working',
+    server_time: new Date().toLocaleString(),
   });
 });
 
 // API Routes
 app.use('/api/v1/user', routeIndex.user.userRoutes);
-app.use('/api/v1/search', routeIndex.search.searchRoutes);
-app.use('/api/v1/credits', routeIndex.credit.routes);
 
 
 // Setup Swagger Documentation

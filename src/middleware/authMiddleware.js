@@ -36,8 +36,7 @@ const authenticate = async (req, res, next) => {
 
     const decoded = verifyAccessToken(tokenRaw);
 
-    // Fetch user data only if the token is valid
-    const user = await userService.getUser({ _id: decoded.id });
+    const user = await userService.getUserByQuery({ _id: decoded.id });
 
     if (!user) {
       return next(new ApiError(status.UNAUTHORIZED, 'User not found'));

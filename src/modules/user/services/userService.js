@@ -151,6 +151,7 @@ const createOrUpdateGoogleUser = async (googleProfile) => {
           name,
           email: normalizedEmail,
           authProvider: 'google',
+          role: 'user',
           isEmailVerified: true,
           profilePicture,
           credits: 2500,
@@ -159,10 +160,8 @@ const createOrUpdateGoogleUser = async (googleProfile) => {
         },
         $set: {
           lastLogin: new Date(),
-          // Update Google ID if user was found by email but didn't have googleId
           ...(googleId && { googleId }),
-          // Update profile picture if not set
-          ...(!profilePicture && profilePicture && { profilePicture })
+          ...(profilePicture && { profilePicture })
         }
       },
       {
@@ -220,7 +219,6 @@ const updateLastLogin = async (userId) => {
 
 module.exports = {
   createUser,
-  getUser: getUserByQuery,
   getUserByQuery,
   getUserById,
   getUserByEmail,

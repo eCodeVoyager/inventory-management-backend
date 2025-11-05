@@ -1,17 +1,9 @@
-const passport = require('passport');
 const userService = require('../services/userService');
 const { generateAccessToken, verifyAccessToken } = require('../../../utils/jwtToken');
 const ApiResponse = require('../../../utils/apiResponse');
 const ApiError = require('../../../utils/apiError');
 const catchAsync = require('../../../utils/catchAsync');
 const { status } = require('http-status');
-
-/**
- * Initiate Google OAuth authentication
- */
-const googleAuth = passport.authenticate('google', {
-  scope: ['profile', 'email'],
-});
 
 /**
  * Handle Google OAuth callback
@@ -89,6 +81,7 @@ const verifyToken = catchAsync(async (req, res) => {
       id: user._id,
       email: user.email,
       name: user.name,
+      role: user.role,
       avatar: user.avatar,
       credits: user.credits,
       isActive: user.isActive,
@@ -132,6 +125,7 @@ const updateUser = catchAsync(async (req, res) => {
     id: updatedUser._id,
     email: updatedUser.email,
     name: updatedUser.name,
+    role: updatedUser.role,
     avatar: updatedUser.avatar,
     credits: updatedUser.credits,
     isActive: updatedUser.isActive,
@@ -156,6 +150,7 @@ const getCurrentUser = catchAsync(async (req, res) => {
     id: user._id,
     email: user.email,
     name: user.name,
+    role: user.role,
     avatar: user.avatar,
     credits: user.credits,
     isActive: user.isActive,
@@ -177,7 +172,6 @@ const logout = catchAsync(async (req, res) => {
 });
 
 module.exports = {
-  googleAuth,
   googleCallback,
   verifyToken,
   updateUser,
